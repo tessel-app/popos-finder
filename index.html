@@ -117,6 +117,21 @@
             font-family: monospace;
             text-align: left;
         }
+        .rating-container {
+            margin-top: 10px;
+        }
+        .rating-btn {
+            background-color: #f0f0f0;
+            border: 1px solid #ddd;
+            padding: 5px 10px;
+            margin: 0 5px;
+            cursor: pointer;
+            border-radius: 3px;
+        }
+        .rating-btn.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
         @media (max-width: 768px) {
             .container {
                 padding: 10px;
@@ -146,7 +161,164 @@
 
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     <script>
-        // ... (JavaScript remains the same as in the previous version) ...
+        const poposLocations = [
+            { id: 1, name: "Transamerica Redwood Park", address: "600 Montgomery St.", schedule: "Mon - Fri 7am - 5:30pm", lat: 37.7952, lon: -122.4028 },
+            { id: 2, name: "Empire Park", address: "648 Commercial St.", schedule: "Mon - Fri 7am - 5:30pm", lat: 37.7977, lon: -122.4016 },
+            { id: 3, name: "Embarcadero Center", address: "400-492 Commercial St.", schedule: "Not specified", lat: 37.7947, lon: -122.3996 },
+            { id: 4, name: "343 Sansome", address: "343 Sansome St.", schedule: "Mon - Fri 10am - 5pm", lat: 37.7936, lon: -122.4014 },
+            { id: 5, name: "555 California", address: "555 California St.", schedule: "Open at all times.", lat: 37.7924, lon: -122.4037 },
+            { id: 6, name: "150 California", address: "150 California St.", schedule: "Mon - Fri 9am - 6pm", lat: 37.7934, lon: -122.3982 },
+            { id: 7, name: "101 California", address: "101 California St.", schedule: "Open at all times.", lat: 37.7930, lon: -122.3983 },
+            { id: 8, name: "100 Pine", address: "100 Pine St.", schedule: "10am - 6pm", lat: 37.7924, lon: -122.3992 },
+            { id: 9, name: "One Bush Plaza", address: "1 Bush St.", schedule: "Open at all times.", lat: 37.7913, lon: -122.4014 },
+            { id: 10, name: "Citigroup Center", address: "1 Sansome St.", schedule: "Open during business hours.", lat: 37.7902, lon: -122.4017 }
+        ];
+
+        let map;
+        let userMarker;
+
+        function initMap() {
+            console.log("Initializing map...");
+            try {
+                if (typeof L === "undefined") {
+                    throw new Error("Leaflet library not loaded");
+                }
+                console.log("Leaflet library loaded successfully");
+
+                map = L.map('map').setView([37.7749, -122.4194], 14);
+                console.log("Map object created");
+
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '© OpenStreetMap contributors'
+                }).addTo(map);
+                console.log("Tile layer added to map");
+
+                poposLocations.forEach(location => {
+                    L.marker([location.lat, location.lon])
+                     .addTo(map)
+                     .bindPopup(createPoposPopup(location));
+                });
+                console.log("Markers added to map");
+
+                document.getElementById('debug-info').innerHTML = "Map initialized successfully";
+            } catch (error) {
+                console.error("Error initializing map:", error);
+                document.getElementById('map').innerHTML = `<p class="error-message">Unable to load the map. Error: ${error.message}</p>`;
+                document.getElementById('debug-info').innerHTML = `Error initializing map: ${error.message}`;
+            }
+        }
+
+        function findNearestPOPOS() {
+            if ("geolocation" in navigator) {
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    const userLat = position.coords.latitude;
+                    const userLon = position.coords.longitude;
+                    
+                    console.log(`User location: ${userLat}, ${userLon}`);
+
+                    let sortedLocations = poposLocations.map(location => ({
+                        ...location,
+                        distance: getDistanceFromLatLonInKm(userLat, userLon, location.lat, location.lon)
+                    })).sort((a, b) => a.distance - b.distance);
+
+                    const [closest, second, third] = sortedLocations;
+
+                    document.getElementById('result').innerHTML = `
+                        <p>The nearest POPOS is <strong><a href="https://sfpopos.com/popos/${closest.id}" target="_blank">${closest.name}</a></strong>.</p>
+                        <p><span style="color: #666;">Address:</span> ${closest.address}</p>
+                        <p><span style="color: #666;">Hours:</span> ${closest.schedule}</p>
+                        <p>It is approximately ${closest.distance.toFixed(2)} km away from your current location.</p>
+                        <a href="https://www.google.com/maps/search/?api=1&query=${closest.lat},${closest.lon}" target="_blank" class="maps-link">Open in Google Maps</a>
+                        
+                        <div class="secondary-results">
+                            <p>Other nearby POPOS:</p>
+                            <p>2. <a href="https://sfpopos.com/popos/${second.id}" target="_blank">${second.name}</a> (${second.distance.toFixed(2)} km)</p>
+                            <p>3. <a href="https://sfpopos.com/popos/${third.id}" target="_blank">${third.name}</a> (${third.distance.toFixed(2)} km)</p>
+                        </div>
+                    `;
+                    
+                    if (map) {
+                        map.setView([userLat, userLon], 15);
+                        
+                        if (userMarker) {
+                            map.removeLayer(userMarker);
+                        }
+                        userMarker = L.marker([userLat, userLon]).addTo(map).bindPopup('Your Location').openPopup();
+                        
+                        L.polyline([[userLat, userLon], [closest.lat, closest.lon]], {color: 'var(--primary-color)'}).addTo(map);
+                        console.log("Map updated with user location and nearest POPOS");
+                    } else {
+                        console.error("Map not initialized");
+                        document.getElementById('result').innerHTML += '<p class="error-message">Unable to display on map. Please try refreshing the page.</p>';
+                    }
+                }, function(error) {
+                    console.error("Geolocation error:", error);
+                    document.getElementById('result').innerHTML = `<p class="error-message">Error getting location: ${error.message}</p>`;
+                });
+            } else {
+                console.error("Geolocation not supported");
+                document.getElementById('result').innerHTML = '<p class="error-message">Geolocation is not supported by your browser. Please try using a different browser or device.</p>';
+            }
+        }
+
+        function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
+            const R = 6371;
+            const dLat = deg2rad(lat2-lat1);
+            const dLon = deg2rad(lon2-lon1); 
+            const a = 
+                Math.sin(dLat/2) * Math.sin(dLat/2) +
+                Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * 
+                Math.sin(dLon/2) * Math.sin(dLon/2)
+            ; 
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+            return R * c;
+        }
+
+        function deg2rad(deg) {
+            return deg * (Math.PI/180);
+        }
+
+        function ratePopos(id, rating) {
+            let ratings = JSON.parse(localStorage.getItem('poposRatings')) || {};
+            ratings[id] = rating;
+            localStorage.setItem('poposRatings', JSON.stringify(ratings));
+            updateRatingDisplay(id);
+        }
+
+        function updateRatingDisplay(id) {
+            let ratings = JSON.parse(localStorage.getItem('poposRatings')) || {};
+            let ratingContainer = document.getElementById(`rating-${id}`);
+            if (ratingContainer) {
+                let thumbsUp = ratingContainer.querySelector('.thumbs-up');
+                let thumbsDown = ratingContainer.querySelector('.thumbs-down');
+                thumbsUp.classList.toggle('active', ratings[id] === 'up');
+                thumbsDown.classList.toggle('active', ratings[id] === 'down');
+            }
+        }
+
+        function createPoposPopup(location) {
+            return `
+                <strong>${location.name}</strong><br>
+                <span style="color: #666;">Address:</span> ${location.address}<br>
+                <span style="color: #666;">Hours:</span> ${location.schedule}<br>
+                <a href="https://sfpopos.com/popos/${location.id}" target="_blank">More Info</a><br>
+                <a href="https://www.google.com/maps/search/?api=1&query=${location.lat},${location.lon}" target="_blank" class="maps-link">Open in Google Maps</a>
+                <div class="rating-container" id="rating-${location.id}">
+                    <button onclick="ratePopos(${location.id}, 'up')" class="rating-btn thumbs-up">👍</button>
+                    <button onclick="ratePopos(${location.id}, 'down')" class="rating-btn thumbs-down">👎</button>
+                </div>
+            `;
+        }
+
+        // Initialize the map when the page loads
+        window.onload = function() {
+            console.log("Window loaded, initializing map...");
+            initMap
+            // Initialize the map when the page loads
+        window.onload = function() {
+            console.log("Window loaded, initializing map...");
+            initMap();
+        };
     </script>
 </body>
 </html>
