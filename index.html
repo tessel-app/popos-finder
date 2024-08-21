@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nearest POPOS Finder</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        #map { height: 400px; margin-top: 20px; }
+        #result { margin-top: 10px; }
+    </style>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+</head>
+<body>
+    <h1>Find the Nearest POPOS</h1>
+    <button onclick="findNearestPOPOS()">Find Nearest POPOS</button>
+    <div id="result"></div>
+    <div id="map"></div>
+
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script>
+        // All POPOS locations from sfpopos.com
+        const poposLocations = [
+            { name: "343 Sansome Roof Garden", lat: 37.7936, lon: -122.4014 },
+            { name: "525 Market Street Plaza", lat: 37.7905, lon: -122.3991 },
+            { name: "Transamerica Redwood Park", lat: 37.7952, lon: -122.4028 },
+            { name: "Empire Park", lat: 37.7977, lon: -122.4016 },
+            { name: "50 California Street", lat: 37.7936, lon: -122.3973 },
+            { name: "100 First Street", lat: 37.7891, lon: -122.3982 },
+            { name: "101 California", lat: 37.7930, lon: -122.3983 },
+            { name: "100 Pine Street", lat: 37.7924, lon: -122.3992 },
+            { name: "150 California Street", lat: 37.7934, lon: -122.3982 },
+            { name: "150 California Street", lat: 37.7933, lon: -122.3980 },
+            { name: "201 California", lat: 37.7930, lon: -122.3987 },
+            { name: "425 Market Street", lat: 37.7913, lon: -122.3986 },
+            { name: "555 California", lat: 37.7924, lon: -122.4037 },
+            { name: "Citigroup Center", lat: 37.7902, lon: -122.4017 },
+            { name: "150 California Street", lat: 37.7934, lon: -122.3981 },
+            { name: "100 Pine Street", lat: 37.7925, lon: -122.3992 },
+            { name: "101 Second Street", lat: 37.7880, lon: -122.3994 },
+            { name: "222 Second Street", lat: 37.7861, lon: -122.3987 },
+            { name: "235 Second Street", lat: 37.7857, lon: -122.3989 },
+            { name: "One Bush Plaza", lat: 37.7913, lon: -122.4014 },
+            { name: "One Post Street", lat: 37.7889, lon: -122.4023 },
+            { name: "Mechanics Monument Plaza", lat: 37.7913, lon: -122.4003 },
+            { name: "555 Mission Street", lat: 37.7883, lon: -122.3987 },
+            { name: "560 Mission Street", lat: 37.7886, lon: -122.3994 },
+            { name: "Embarcadero Center", lat: 37.7947, lon: -122.3996 },
+            { name: "100 First Plaza", lat: 37.7892, lon: -122.3980 },
+            { name: "Salesforce Park", lat: 37.7893, lon: -122.3969 },
+            { name: "Salesforce Plaza", lat: 37.7904, lon: -122.3963 },
+            { name: "711 Market Street Plaza", lat: 37.7871, lon: -122.4046 },
+            { name: "Westfield Sky Terrace", lat: 37.7847, lon: -122.4065 },
+            { name: "545 Market Street Plaza", lat: 37.7896, lon: -122.3993 },
+            { name: "California Street Cable Car Turnaround Plaza", lat: 37.7920, lon: -122.4066 },
+            { name: "Crocker Galleria", lat: 37.7897, lon: -122.4023 },
+            { name: "Beale Street Plaza", lat: 37.7905, lon: -122.3965 },
+            { name: "Frontenac Condos Terrace", lat: 37.7910, lon: -122.4031 },
+            { name: "Telesis Tower", lat: 37.7900, lon: -122.4034 },
+            { name: "Citicorp Center", lat: 37.7904, lon: -122.4014 },
+            { name: "50 Fremont Center", lat: 37.7908, lon: -122.3976 },
+            { name: "Market Center", lat: 37.7893, lon: -122.4023 },
+            { name: "Millennium Tower Plaza", lat: 37.7904, lon: -122.3963 },
+            { name: "88 Kearny Street", lat: 37.7883, lon: -122.4032 },
+            { name: "100 Larkin Street Plaza", lat: 37.7801, lon: -122.4161 },
+            { name: "150 Spear Street Plaza", lat: 37.7913, lon: -122.3943 },
+            { name: "160 Spear Street Plaza", lat: 37.7916, lon: -122.3943 },
+            { name: "201 Spear Street Plaza", lat: 37.7913, lon: -122.3931 },
+            { name: "Howard & Fremont Plaza", lat: 37.7897, lon: -122.3959 },
+            { name: "135 Main Street", lat: 37.7918, lon: -122.3946 },
+            { name: "150 California Street", lat: 37.7934, lon: -122.3981 },
+            { name: "123 Mission Street", lat: 37.7918, lon: -122.3942 },
+            { name: "155 Main Street", lat: 37.7912, lon: -122.3938 },
+            { name: "505 Montgomery Plaza", lat: 37.7940, lon: -122.4025 },
+        ];
+
+        let map;
+
+        function initMap() {
+            map = L.map('map').setView([37.7749, -122.4194], 13);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(map);
+        }
+
+        function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
+            const R = 6371;
+            const dLat = deg2rad(lat2-lat1);
+            const dLon = deg2rad(lon2-lon1); 
+            const a = 
+                Math.sin(dLat/2) * Math.sin(dLat/2) +
+                Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * 
+                Math.sin(dLon/2) * Math.sin(dLon/2)
+            ; 
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+            return R * c;
+        }
+
+        function deg2rad(deg) {
+            return deg * (Math.PI/180);
+        }
+
+        function findNearestPOPOS() {
+            if ("geolocation" in navigator) {
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    const userLat = position.coords.latitude;
+                    const userLon = position.coords.longitude;
+                    
+                    let closest = poposLocations.reduce((prev, curr) => 
+                        getDistanceFromLatLonInKm(userLat, userLon, prev.lat, prev.lon) < 
+                        getDistanceFromLatLonInKm(userLat, userLon, curr.lat, curr.lon) ? prev : curr
+                    );
+
+                    const distance = getDistanceFromLatLonInKm(userLat, userLon, closest.lat, closest.lon).toFixed(2);
+
+                    document.getElementById('result').innerHTML = `
+                        <p>The nearest POPOS is <strong>${closest.name}</strong>.</p>
+                        <p>It is approximately ${distance} km away from your current location.</p>
+                    `;
+                    
+                    map.setView([userLat, userLon], 15);
+                    map.eachLayer((layer) => {
+                        if(layer instanceof L.Marker){
+                            map.removeLayer(layer);
+                        }
+                    });
+                    L.marker([userLat, userLon]).addTo(map).bindPopup('Your Location').openPopup();
+                    L.marker([closest.lat, closest.lon]).addTo(map).bindPopup(closest.name);
+                }, function(error) {
+                    document.getElementById('result').textContent = "Error: " + error.message;
+                });
+            } else {
+                document.getElementById('result').textContent = "Geolocation is not available in your browser.";
+            }
+        }
+
+        // Initialize the map when the page loads
+        window.onload = initMap;
+    </script>
+</body>
+</html>
