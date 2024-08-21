@@ -4,31 +4,93 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>POPOS Finder</title>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
     <style>
-        body { 
-            font-family: 'Playfair Display', serif; 
-            max-width: 800px; 
-            margin: 0 auto; 
-            padding: 20px; 
+        :root {
+            --primary-color: #4a90e2;
+            --secondary-color: #f5a623;
+            --background-color: #f4f4f4;
+            --text-color: #333;
         }
-        #map { height: 500px; margin-top: 20px; }
-        #result { margin-top: 10px; }
-        h1 { font-weight: 700; }
+        body { 
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            text-align: center;
+            padding: 1rem;
+            margin-bottom: 2rem;
+        }
+        h1 { 
+            font-weight: 600;
+            margin: 0;
+        }
+        #map { 
+            height: 400px;
+            margin-top: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        #result { 
+            margin-top: 20px;
+            padding: 15px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
         button {
-            font-family: 'Playfair Display', serif;
+            font-family: 'Poppins', sans-serif;
             font-size: 16px;
+            font-weight: 600;
             padding: 10px 20px;
             cursor: pointer;
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #e09400;
+        }
+        a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            #map {
+                height: 300px;
+            }
         }
     </style>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
 </head>
 <body>
-    <h1>POPOS Finder</h1>
-    <button onclick="findNearestPOPOS()">Find Nearest POPOS</button>
-    <div id="result"></div>
-    <div id="map"></div>
+    <header>
+        <h1>POPOS Finder</h1>
+    </header>
+    <div class="container">
+        <button onclick="findNearestPOPOS()">Find Nearest POPOS</button>
+        <div id="result"></div>
+        <div id="map"></div>
+    </div>
 
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     <script>
@@ -140,7 +202,7 @@
                     }
                     userMarker = L.marker([userLat, userLon]).addTo(map).bindPopup('Your Location').openPopup();
                     
-                    L.polyline([[userLat, userLon], [closest.lat, closest.lon]], {color: 'red'}).addTo(map);
+                    L.polyline([[userLat, userLon], [closest.lat, closest.lon]], {color: 'var(--secondary-color)'}).addTo(map);
                 }, function(error) {
                     document.getElementById('result').textContent = "Error: " + error.message;
                 });
