@@ -33,53 +33,53 @@
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     <script>
         const poposLocations = [
-            { name: "343 Sansome Roof Garden", lat: 37.7936, lon: -122.4014, url: "https://sfpopos.com/location/343-sansome-roof-garden/" },
-            { name: "525 Market Street Plaza", lat: 37.7905, lon: -122.3991, url: "https://sfpopos.com/location/525-market-street-plaza/" },
-            { name: "Transamerica Redwood Park", lat: 37.7952, lon: -122.4028, url: "https://sfpopos.com/location/transamerica-redwood-park/" },
-            { name: "Empire Park", lat: 37.7977, lon: -122.4016, url: "https://sfpopos.com/location/empire-park/" },
-            { name: "50 California Street", lat: 37.7936, lon: -122.3973, url: "https://sfpopos.com/location/50-california-street/" },
-            { name: "100 First Street", lat: 37.7891, lon: -122.3982, url: "https://sfpopos.com/location/100-first-street/" },
-            { name: "101 California", lat: 37.7930, lon: -122.3983, url: "https://sfpopos.com/location/101-california/" },
-            { name: "100 Pine Street", lat: 37.7924, lon: -122.3992, url: "https://sfpopos.com/location/100-pine-street/" },
-            { name: "150 California Street", lat: 37.7934, lon: -122.3982, url: "https://sfpopos.com/location/150-california-street/" },
-            { name: "201 California", lat: 37.7930, lon: -122.3987, url: "https://sfpopos.com/location/201-california/" },
-            { name: "425 Market Street", lat: 37.7913, lon: -122.3986, url: "https://sfpopos.com/location/425-market-street/" },
-            { name: "555 California", lat: 37.7924, lon: -122.4037, url: "https://sfpopos.com/location/555-california/" },
-            { name: "Citigroup Center", lat: 37.7902, lon: -122.4017, url: "https://sfpopos.com/location/citigroup-center/" },
-            { name: "101 Second Street", lat: 37.7880, lon: -122.3994, url: "https://sfpopos.com/location/101-second-street/" },
-            { name: "222 Second Street", lat: 37.7861, lon: -122.3987, url: "https://sfpopos.com/location/222-second-street/" },
-            { name: "235 Second Street", lat: 37.7857, lon: -122.3989, url: "https://sfpopos.com/location/235-second-street/" },
-            { name: "One Bush Plaza", lat: 37.7913, lon: -122.4014, url: "https://sfpopos.com/location/one-bush-plaza/" },
-            { name: "One Post Street", lat: 37.7889, lon: -122.4023, url: "https://sfpopos.com/location/one-post-street/" },
-            { name: "Mechanics Monument Plaza", lat: 37.7913, lon: -122.4003, url: "https://sfpopos.com/location/mechanics-monument-plaza/" },
-            { name: "555 Mission Street", lat: 37.7883, lon: -122.3987, url: "https://sfpopos.com/location/555-mission-street/" },
-            { name: "560 Mission Street", lat: 37.7886, lon: -122.3994, url: "https://sfpopos.com/location/560-mission-street/" },
-            { name: "Embarcadero Center", lat: 37.7947, lon: -122.3996, url: "https://sfpopos.com/location/embarcadero-center/" },
-            { name: "100 First Plaza", lat: 37.7892, lon: -122.3980, url: "https://sfpopos.com/location/100-first-plaza/" },
-            { name: "Salesforce Park", lat: 37.7893, lon: -122.3969, url: "https://sfpopos.com/location/salesforce-park/" },
-            { name: "Salesforce Plaza", lat: 37.7904, lon: -122.3963, url: "https://sfpopos.com/location/salesforce-plaza/" },
-            { name: "711 Market Street Plaza", lat: 37.7871, lon: -122.4046, url: "https://sfpopos.com/location/711-market-street-plaza/" },
-            { name: "Westfield Sky Terrace", lat: 37.7847, lon: -122.4065, url: "https://sfpopos.com/location/westfield-sky-terrace/" },
-            { name: "545 Market Street Plaza", lat: 37.7896, lon: -122.3993, url: "https://sfpopos.com/location/545-market-street-plaza/" },
-            { name: "California Street Cable Car Turnaround Plaza", lat: 37.7920, lon: -122.4066, url: "https://sfpopos.com/location/california-street-cable-car-turnaround-plaza/" },
-            { name: "Crocker Galleria", lat: 37.7897, lon: -122.4023, url: "https://sfpopos.com/location/crocker-galleria/" },
-            { name: "Beale Street Plaza", lat: 37.7905, lon: -122.3965, url: "https://sfpopos.com/location/beale-street-plaza/" },
-            { name: "Frontenac Condos Terrace", lat: 37.7910, lon: -122.4031, url: "https://sfpopos.com/location/frontenac-condos-terrace/" },
-            { name: "Telesis Tower", lat: 37.7900, lon: -122.4034, url: "https://sfpopos.com/location/telesis-tower/" },
-            { name: "Citicorp Center", lat: 37.7904, lon: -122.4014, url: "https://sfpopos.com/location/citicorp-center/" },
-            { name: "50 Fremont Center", lat: 37.7908, lon: -122.3976, url: "https://sfpopos.com/location/50-fremont-center/" },
-            { name: "Market Center", lat: 37.7893, lon: -122.4023, url: "https://sfpopos.com/location/market-center/" },
-            { name: "Millennium Tower Plaza", lat: 37.7904, lon: -122.3963, url: "https://sfpopos.com/location/millennium-tower-plaza/" },
-            { name: "88 Kearny Street", lat: 37.7883, lon: -122.4032, url: "https://sfpopos.com/location/88-kearny-street/" },
-            { name: "100 Larkin Street Plaza", lat: 37.7801, lon: -122.4161, url: "https://sfpopos.com/location/100-larkin-street-plaza/" },
-            { name: "150 Spear Street Plaza", lat: 37.7913, lon: -122.3943, url: "https://sfpopos.com/location/150-spear-street-plaza/" },
-            { name: "160 Spear Street Plaza", lat: 37.7916, lon: -122.3943, url: "https://sfpopos.com/location/160-spear-street-plaza/" },
-            { name: "201 Spear Street Plaza", lat: 37.7913, lon: -122.3931, url: "https://sfpopos.com/location/201-spear-street-plaza/" },
-            { name: "Howard & Fremont Plaza", lat: 37.7897, lon: -122.3959, url: "https://sfpopos.com/location/howard-fremont-plaza/" },
-            { name: "135 Main Street", lat: 37.7918, lon: -122.3946, url: "https://sfpopos.com/location/135-main-street/" },
-            { name: "123 Mission Street", lat: 37.7918, lon: -122.3942, url: "https://sfpopos.com/location/123-mission-street/" },
-            { name: "155 Main Street", lat: 37.7912, lon: -122.3938, url: "https://sfpopos.com/location/155-main-street/" },
-            { name: "505 Montgomery Plaza", lat: 37.7940, lon: -122.4025, url: "https://sfpopos.com/location/505-montgomery-plaza/" },
+            { name: "343 Sansome Roof Garden", lat: 37.7936, lon: -122.4014, id: 8 },
+            { name: "525 Market Street Plaza", lat: 37.7905, lon: -122.3991, id: 9 },
+            { name: "Transamerica Redwood Park", lat: 37.7952, lon: -122.4028, id: 10 },
+            { name: "Empire Park", lat: 37.7977, lon: -122.4016, id: 11 },
+            { name: "50 California Street", lat: 37.7936, lon: -122.3973, id: 12 },
+            { name: "100 First Street", lat: 37.7891, lon: -122.3982, id: 13 },
+            { name: "101 California", lat: 37.7930, lon: -122.3983, id: 14 },
+            { name: "100 Pine Street", lat: 37.7924, lon: -122.3992, id: 15 },
+            { name: "150 California Street", lat: 37.7934, lon: -122.3982, id: 16 },
+            { name: "201 California", lat: 37.7930, lon: -122.3987, id: 17 },
+            { name: "425 Market Street", lat: 37.7913, lon: -122.3986, id: 18 },
+            { name: "555 California", lat: 37.7924, lon: -122.4037, id: 19 },
+            { name: "Citigroup Center", lat: 37.7902, lon: -122.4017, id: 20 },
+            { name: "101 Second Street", lat: 37.7880, lon: -122.3994, id: 21 },
+            { name: "222 Second Street", lat: 37.7861, lon: -122.3987, id: 22 },
+            { name: "235 Second Street", lat: 37.7857, lon: -122.3989, id: 23 },
+            { name: "One Bush Plaza", lat: 37.7913, lon: -122.4014, id: 24 },
+            { name: "One Post Street", lat: 37.7889, lon: -122.4023, id: 25 },
+            { name: "Mechanics Monument Plaza", lat: 37.7913, lon: -122.4003, id: 26 },
+            { name: "555 Mission Street", lat: 37.7883, lon: -122.3987, id: 27 },
+            { name: "560 Mission Street", lat: 37.7886, lon: -122.3994, id: 28 },
+            { name: "Embarcadero Center", lat: 37.7947, lon: -122.3996, id: 29 },
+            { name: "100 First Plaza", lat: 37.7892, lon: -122.3980, id: 30 },
+            { name: "Salesforce Park", lat: 37.7893, lon: -122.3969, id: 31 },
+            { name: "Salesforce Plaza", lat: 37.7904, lon: -122.3963, id: 32 },
+            { name: "711 Market Street Plaza", lat: 37.7871, lon: -122.4046, id: 33 },
+            { name: "Westfield Sky Terrace", lat: 37.7847, lon: -122.4065, id: 34 },
+            { name: "545 Market Street Plaza", lat: 37.7896, lon: -122.3993, id: 35 },
+            { name: "California Street Cable Car Turnaround Plaza", lat: 37.7920, lon: -122.4066, id: 36 },
+            { name: "Crocker Galleria", lat: 37.7897, lon: -122.4023, id: 37 },
+            { name: "Beale Street Plaza", lat: 37.7905, lon: -122.3965, id: 38 },
+            { name: "Frontenac Condos Terrace", lat: 37.7910, lon: -122.4031, id: 39 },
+            { name: "Telesis Tower", lat: 37.7900, lon: -122.4034, id: 40 },
+            { name: "Citicorp Center", lat: 37.7904, lon: -122.4014, id: 41 },
+            { name: "50 Fremont Center", lat: 37.7908, lon: -122.3976, id: 42 },
+            { name: "Market Center", lat: 37.7893, lon: -122.4023, id: 43 },
+            { name: "Millennium Tower Plaza", lat: 37.7904, lon: -122.3963, id: 44 },
+            { name: "88 Kearny Street", lat: 37.7883, lon: -122.4032, id: 45 },
+            { name: "100 Larkin Street Plaza", lat: 37.7801, lon: -122.4161, id: 46 },
+            { name: "150 Spear Street Plaza", lat: 37.7913, lon: -122.3943, id: 47 },
+            { name: "160 Spear Street Plaza", lat: 37.7916, lon: -122.3943, id: 48 },
+            { name: "201 Spear Street Plaza", lat: 37.7913, lon: -122.3931, id: 49 },
+            { name: "Howard & Fremont Plaza", lat: 37.7897, lon: -122.3959, id: 50 },
+            { name: "135 Main Street", lat: 37.7918, lon: -122.3946, id: 51 },
+            { name: "123 Mission Street", lat: 37.7918, lon: -122.3942, id: 52 },
+            { name: "155 Main Street", lat: 37.7912, lon: -122.3938, id: 53 },
+            { name: "505 Montgomery Plaza", lat: 37.7940, lon: -122.4025, id: 54 },
         ];
 
         let map;
@@ -94,7 +94,7 @@
             poposLocations.forEach(location => {
                 L.marker([location.lat, location.lon])
                  .addTo(map)
-                 .bindPopup(`<a href="${location.url}" target="_blank">${location.name}</a>`);
+                 .bindPopup(`<a href="https://sfpopos.com/popos/${location.id}" target="_blank">${location.name}</a>`);
             });
         }
 
@@ -129,7 +129,7 @@
                     const distance = getDistanceFromLatLonInKm(userLat, userLon, closest.lat, closest.lon).toFixed(2);
 
                     document.getElementById('result').innerHTML = `
-                        <p>The nearest POPOS is <strong><a href="${closest.url}" target="_blank">${closest.name}</a></strong>.</p>
+                        <p>The nearest POPOS is <strong><a href="https://sfpopos.com/popos/${closest.id}" target="_blank">${closest.name}</a></strong>.</p>
                         <p>It is approximately ${distance} km away from your current location.</p>
                     `;
                     
