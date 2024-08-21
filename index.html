@@ -4,17 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>POPOS Finder</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
     <style>
         :root {
-            --primary-color: #4a90e2;
-            --secondary-color: #f5a623;
-            --background-color: #f4f4f4;
-            --text-color: #333;
+            --primary-color: #39b36b;
+            --secondary-color: #4a4a4a;
+            --background-color: #ffffff;
+            --text-color: #4a4a4a;
         }
         body { 
-            font-family: 'Poppins', sans-serif;
+            font-family: 'Heebo', sans-serif;
             background-color: var(--background-color);
             color: var(--text-color);
             line-height: 1.6;
@@ -34,11 +34,12 @@
             margin-bottom: 2rem;
         }
         h1 { 
-            font-weight: 600;
+            font-weight: 700;
             margin: 0;
+            font-size: 2.5rem;
         }
         #map { 
-            height: 400px;
+            height: 500px;
             margin-top: 20px;
             border-radius: 10px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -46,24 +47,30 @@
         #result { 
             margin-top: 20px;
             padding: 15px;
-            background-color: white;
+            background-color: #f8f8f8;
             border-radius: 10px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
+        .secondary-results {
+            font-size: 0.9em;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #ddd;
+        }
         button {
-            font-family: 'Poppins', sans-serif;
+            font-family: 'Heebo', sans-serif;
             font-size: 16px;
-            font-weight: 600;
-            padding: 10px 20px;
+            font-weight: 700;
+            padding: 12px 24px;
             cursor: pointer;
-            background-color: var(--secondary-color);
+            background-color: var(--primary-color);
             color: white;
             border: none;
             border-radius: 5px;
             transition: background-color 0.3s ease;
         }
         button:hover {
-            background-color: #e09400;
+            background-color: #2d8f55;
         }
         a {
             color: var(--primary-color);
@@ -71,6 +78,26 @@
         }
         a:hover {
             text-decoration: underline;
+        }
+        .maps-link {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 5px 10px;
+            background-color: var(--secondary-color);
+            color: white;
+            border-radius: 5px;
+            text-decoration: none;
+        }
+        .maps-link:hover {
+            background-color: #353535;
+            text-decoration: none;
+        }
+        .leaflet-popup-content-wrapper {
+            border-radius: 5px;
+            font-family: 'Heebo', sans-serif;
+        }
+        .leaflet-popup-content {
+            margin: 10px;
         }
         @media (max-width: 768px) {
             .container {
@@ -95,53 +122,16 @@
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     <script>
         const poposLocations = [
-            { name: "343 Sansome Roof Garden", lat: 37.7936, lon: -122.4014, id: 8 },
-            { name: "525 Market Street Plaza", lat: 37.7905, lon: -122.3991, id: 9 },
-            { name: "Transamerica Redwood Park", lat: 37.7952, lon: -122.4028, id: 10 },
-            { name: "Empire Park", lat: 37.7977, lon: -122.4016, id: 11 },
-            { name: "50 California Street", lat: 37.7936, lon: -122.3973, id: 12 },
-            { name: "100 First Street", lat: 37.7891, lon: -122.3982, id: 13 },
-            { name: "101 California", lat: 37.7930, lon: -122.3983, id: 14 },
-            { name: "100 Pine Street", lat: 37.7924, lon: -122.3992, id: 15 },
-            { name: "150 California Street", lat: 37.7934, lon: -122.3982, id: 16 },
-            { name: "201 California", lat: 37.7930, lon: -122.3987, id: 17 },
-            { name: "425 Market Street", lat: 37.7913, lon: -122.3986, id: 18 },
-            { name: "555 California", lat: 37.7924, lon: -122.4037, id: 19 },
-            { name: "Citigroup Center", lat: 37.7902, lon: -122.4017, id: 20 },
-            { name: "101 Second Street", lat: 37.7880, lon: -122.3994, id: 21 },
-            { name: "222 Second Street", lat: 37.7861, lon: -122.3987, id: 22 },
-            { name: "235 Second Street", lat: 37.7857, lon: -122.3989, id: 23 },
-            { name: "One Bush Plaza", lat: 37.7913, lon: -122.4014, id: 24 },
-            { name: "One Post Street", lat: 37.7889, lon: -122.4023, id: 25 },
-            { name: "Mechanics Monument Plaza", lat: 37.7913, lon: -122.4003, id: 26 },
-            { name: "555 Mission Street", lat: 37.7883, lon: -122.3987, id: 27 },
-            { name: "560 Mission Street", lat: 37.7886, lon: -122.3994, id: 28 },
-            { name: "Embarcadero Center", lat: 37.7947, lon: -122.3996, id: 29 },
-            { name: "100 First Plaza", lat: 37.7892, lon: -122.3980, id: 30 },
-            { name: "Salesforce Park", lat: 37.7893, lon: -122.3969, id: 31 },
-            { name: "Salesforce Plaza", lat: 37.7904, lon: -122.3963, id: 32 },
-            { name: "711 Market Street Plaza", lat: 37.7871, lon: -122.4046, id: 33 },
-            { name: "Westfield Sky Terrace", lat: 37.7847, lon: -122.4065, id: 34 },
-            { name: "545 Market Street Plaza", lat: 37.7896, lon: -122.3993, id: 35 },
-            { name: "California Street Cable Car Turnaround Plaza", lat: 37.7920, lon: -122.4066, id: 36 },
-            { name: "Crocker Galleria", lat: 37.7897, lon: -122.4023, id: 37 },
-            { name: "Beale Street Plaza", lat: 37.7905, lon: -122.3965, id: 38 },
-            { name: "Frontenac Condos Terrace", lat: 37.7910, lon: -122.4031, id: 39 },
-            { name: "Telesis Tower", lat: 37.7900, lon: -122.4034, id: 40 },
-            { name: "Citicorp Center", lat: 37.7904, lon: -122.4014, id: 41 },
-            { name: "50 Fremont Center", lat: 37.7908, lon: -122.3976, id: 42 },
-            { name: "Market Center", lat: 37.7893, lon: -122.4023, id: 43 },
-            { name: "Millennium Tower Plaza", lat: 37.7904, lon: -122.3963, id: 44 },
-            { name: "88 Kearny Street", lat: 37.7883, lon: -122.4032, id: 45 },
-            { name: "100 Larkin Street Plaza", lat: 37.7801, lon: -122.4161, id: 46 },
-            { name: "150 Spear Street Plaza", lat: 37.7913, lon: -122.3943, id: 47 },
-            { name: "160 Spear Street Plaza", lat: 37.7916, lon: -122.3943, id: 48 },
-            { name: "201 Spear Street Plaza", lat: 37.7913, lon: -122.3931, id: 49 },
-            { name: "Howard & Fremont Plaza", lat: 37.7897, lon: -122.3959, id: 50 },
-            { name: "135 Main Street", lat: 37.7918, lon: -122.3946, id: 51 },
-            { name: "123 Mission Street", lat: 37.7918, lon: -122.3942, id: 52 },
-            { name: "155 Main Street", lat: 37.7912, lon: -122.3938, id: 53 },
-            { name: "505 Montgomery Plaza", lat: 37.7940, lon: -122.4025, id: 54 },
+            { id: 1, name: "Transamerica Redwood Park", address: "600 Montgomery St.", schedule: "Mon - Fri 7am - 5:30pm", lat: 37.7952, lon: -122.4028 },
+            { id: 2, name: "Empire Park", address: "648 Commercial St.", schedule: "Mon - Fri 7am - 5:30pm", lat: 37.7977, lon: -122.4016 },
+            { id: 3, name: "Embarcadero Center", address: "400-492 Commercial St.", schedule: "Not specified", lat: 37.7947, lon: -122.3996 },
+            { id: 4, name: "343 Sansome", address: "343 Sansome St.", schedule: "Mon - Fri 10am - 5pm", lat: 37.7936, lon: -122.4014 },
+            { id: 5, name: "555 California", address: "555 California St.", schedule: "Open at all times.", lat: 37.7924, lon: -122.4037 },
+            { id: 6, name: "150 California", address: "150 California St.", schedule: "Mon - Fri 9am - 6pm", lat: 37.7934, lon: -122.3982 },
+            { id: 7, name: "101 California", address: "101 California St.", schedule: "Open at all times.", lat: 37.7930, lon: -122.3983 },
+            { id: 8, name: "100 Pine", address: "100 Pine St.", schedule: "10am - 6pm", lat: 37.7924, lon: -122.3992 },
+            { id: 9, name: "One Bush Plaza", address: "1 Bush St.", schedule: "Open at all times.", lat: 37.7913, lon: -122.4014 },
+            { id: 10, name: "Citigroup Center", address: "1 Sansome St.", schedule: "Open during business hours.", lat: 37.7902, lon: -122.4017 },
         ];
 
         let map;
@@ -156,7 +146,13 @@
             poposLocations.forEach(location => {
                 L.marker([location.lat, location.lon])
                  .addTo(map)
-                 .bindPopup(`<a href="https://sfpopos.com/popos/${location.id}" target="_blank">${location.name}</a>`);
+                 .bindPopup(`
+                    <strong>${location.name}</strong><br>
+                    <span style="color: #666;">Address:</span> ${location.address}<br>
+                    <span style="color: #666;">Hours:</span> ${location.schedule}<br>
+                    <a href="https://sfpopos.com/popos/${location.id}" target="_blank">More Info</a><br>
+                    <a href="https://www.google.com/maps/search/?api=1&query=${location.lat},${location.lon}" target="_blank" class="maps-link">Open in Google Maps</a>
+                 `);
             });
         }
 
@@ -183,16 +179,25 @@
                     const userLat = position.coords.latitude;
                     const userLon = position.coords.longitude;
                     
-                    let closest = poposLocations.reduce((prev, curr) => 
-                        getDistanceFromLatLonInKm(userLat, userLon, prev.lat, prev.lon) < 
-                        getDistanceFromLatLonInKm(userLat, userLon, curr.lat, curr.lon) ? prev : curr
-                    );
+                    let sortedLocations = poposLocations.map(location => ({
+                        ...location,
+                        distance: getDistanceFromLatLonInKm(userLat, userLon, location.lat, location.lon)
+                    })).sort((a, b) => a.distance - b.distance);
 
-                    const distance = getDistanceFromLatLonInKm(userLat, userLon, closest.lat, closest.lon).toFixed(2);
+                    const [closest, second, third] = sortedLocations;
 
                     document.getElementById('result').innerHTML = `
                         <p>The nearest POPOS is <strong><a href="https://sfpopos.com/popos/${closest.id}" target="_blank">${closest.name}</a></strong>.</p>
-                        <p>It is approximately ${distance} km away from your current location.</p>
+                        <p><span style="color: #666;">Address:</span> ${closest.address}</p>
+                        <p><span style="color: #666;">Hours:</span> ${closest.schedule}</p>
+                        <p>It is approximately ${closest.distance.toFixed(2)} km away from your current location.</p>
+                        <a href="https://www.google.com/maps/search/?api=1&query=${closest.lat},${closest.lon}" target="_blank" class="maps-link">Open in Google Maps</a>
+                        
+                        <div class="secondary-results">
+                            <p>Other nearby POPOS:</p>
+                            <p>2. <a href="https://sfpopos.com/popos/${second.id}" target="_blank">${second.name}</a> (${second.distance.toFixed(2)} km)</p>
+                            <p>3. <a href="https://sfpopos.com/popos/${third.id}" target="_blank">${third.name}</a> (${third.distance.toFixed(2)} km)</p>
+                        </div>
                     `;
                     
                     map.setView([userLat, userLon], 15);
@@ -202,7 +207,7 @@
                     }
                     userMarker = L.marker([userLat, userLon]).addTo(map).bindPopup('Your Location').openPopup();
                     
-                    L.polyline([[userLat, userLon], [closest.lat, closest.lon]], {color: 'var(--secondary-color)'}).addTo(map);
+                    L.polyline([[userLat, userLon], [closest.lat, closest.lon]], {color: var(--primary-color)}).addTo(map);
                 }, function(error) {
                     document.getElementById('result').textContent = "Error: " + error.message;
                 });
