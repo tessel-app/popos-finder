@@ -15,7 +15,7 @@
         }
         body { 
             font-family: 'Inter', sans-serif;
-            background-color: var(--background-color);
+            background-color: #C5D86D;
             color: var(--text-color);
             line-height: 1.6;
             margin: 0;
@@ -51,7 +51,8 @@
             background-color: #f8f8f8;
             border-radius: 10px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            max-width: 600px;
+            width: 100%;
+            box-sizing: border-box;
             text-align: left;
         }
         .secondary-results {
@@ -109,14 +110,6 @@
             padding: 10px;
             color: #4a4a4a;
         }
-        #debug-info {
-            margin-top: 20px;
-            padding: 10px;
-            background-color: #f0f0f0;
-            border: 1px solid #ddd;
-            font-family: monospace;
-            text-align: left;
-        }
         .rating-container {
             margin-top: 10px;
         }
@@ -154,9 +147,8 @@
     </header>
     <div class="container">
         <button onclick="findNearestPOPOS()">Find Nearest POPOS</button>
-        <div id="result"></div>
         <div id="map"></div>
-        <div id="debug-info"></div>
+        <div id="result"></div>
     </div>
 
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
@@ -178,64 +170,55 @@
         let userMarker;
 
         function initMap() {
-            console.log("Initializing map...");
-            try {
-                if (typeof L === "undefined") {
-                    throw new Error("Leaflet library not loaded");
-                }
-                console.log("Leaflet library loaded successfully");
+            map = L.map('map').setView([37.7749, -122.4194], 14);
 
-                map = L.map('map').setView([37.7749, -122.4194], 14);
-                console.log("Map object created");
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(map);
 
-                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                    attribution: '© OpenStreetMap contributors'
-                }).addTo(map);
-                console.log("Tile layer added to map");
-
-                poposLocations.forEach(location => {
-                    L.marker([location.lat, location.lon])
-                     .addTo(map)
-                     .bindPopup(createPoposPopup(location));
-                });
-                console.log("Markers added to map");
-
-                document.getElementById('debug-info').innerHTML = "Map initialized successfully";
-            } catch (error) {
-                console.error("Error initializing map:", error);
-                document.getElementById('map').innerHTML = `<p class="error-message">Unable to load the map. Error: ${error.message}</p>`;
-                document.getElementById('debug-info').innerHTML = `Error initializing map: ${error.message}`;
-            }
+            poposLocations.forEach(location => {
+                L.marker([location.lat, location.lon])
+                 .addTo(map)
+                 .bindPopup(createPoposPopup(location));
+            });
         }
 
+        function formatDistance(miles) {
+    if (miles < 0.5) {
+        const feet = Math.round(miles * 5280);
+        const walkingMinutes = Math.round(feet / 272); // Assuming average walking speed of 3.1 mph
+        return `${feet} feet (about ${walkingMinutes} min walk)`;
+    } else {
+        return `${miles.toFixed(2)} miles`;
+    }
+}
+        
         function findNearestPOPOS() {
             if ("geolocation" in navigator) {
                 navigator.geolocation.getCurrentPosition(function(position) {
                     const userLat = position.coords.latitude;
                     const userLon = position.coords.longitude;
                     
-                    console.log(`User location: ${userLat}, ${userLon}`);
-
                     let sortedLocations = poposLocations.map(location => ({
                         ...location,
-                        distance: getDistanceFromLatLonInKm(userLat, userLon, location.lat, location.lon)
+                        distance: getDistanceFromLatLonInMiles(userLat, userLon, location.lat, location.lon)
                     })).sort((a, b) => a.distance - b.distance);
 
                     const [closest, second, third] = sortedLocations;
 
                     document.getElementById('result').innerHTML = `
-                        <p>The nearest POPOS is <strong><a href="https://sfpopos.com/popos/${closest.id}" target="_blank">${closest.name}</a></strong>.</p>
-                        <p><span style="color: #666;">Address:</span> ${closest.address}</p>
-                        <p><span style="color: #666;">Hours:</span> ${closest.schedule}</p>
-                        <p>It is approximately ${closest.distance.toFixed(2)} km away from your current location.</p>
-                        <a href="https://www.google.com/maps/search/?api=1&query=${closest.lat},${closest.lon}" target="_blank" class="maps-link">Open in Google Maps</a>
-                        
-                        <div class="secondary-results">
-                            <p>Other nearby POPOS:</p>
-                            <p>2. <a href="https://sfpopos.com/popos/${second.id}" target="_blank">${second.name}</a> (${second.distance.toFixed(2)} km)</p>
-                            <p>3. <a href="https://sfpopos.com/popos/${third.id}" target="_blank">${third.name}</a> (${third.distance.toFixed(2)} km)</p>
-                        </div>
-                    `;
+    <p>The nearest POPOS is <strong><a href="https://sfpopos.com/popos/${closest.id}" target="_blank">${closest.name}</a></strong>.</p>
+    <p><span style="color: #666;">Address:</span> ${closest.address}</p>
+    <p><span style="color: #666;">Hours:</span> ${closest.schedule}</p>
+    <p>It is approximately ${formatDistance(closest.distance)} away from your current location.</p>
+    <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(closest.address)}" target="_blank" class="maps-link">Open in Google Maps</a>
+    
+    <div class="secondary-results">
+        <p>Other nearby POPOS:</p>
+        <p>2. <a href="https://sfpopos.com/popos/${second.id}" target="_blank">${second.name}</a> (${formatDistance(second.distance)})</p>
+        <p>3. <a href="https://sfpopos.com/popos/${third.id}" target="_blank">${third.name}</a> (${formatDistance(third.distance)})</p>
+    </div>
+`;
                     
                     if (map) {
                         map.setView([userLat, userLon], 15);
@@ -246,23 +229,19 @@
                         userMarker = L.marker([userLat, userLon]).addTo(map).bindPopup('Your Location').openPopup();
                         
                         L.polyline([[userLat, userLon], [closest.lat, closest.lon]], {color: 'var(--primary-color)'}).addTo(map);
-                        console.log("Map updated with user location and nearest POPOS");
                     } else {
-                        console.error("Map not initialized");
                         document.getElementById('result').innerHTML += '<p class="error-message">Unable to display on map. Please try refreshing the page.</p>';
                     }
                 }, function(error) {
-                    console.error("Geolocation error:", error);
                     document.getElementById('result').innerHTML = `<p class="error-message">Error getting location: ${error.message}</p>`;
                 });
             } else {
-                console.error("Geolocation not supported");
                 document.getElementById('result').innerHTML = '<p class="error-message">Geolocation is not supported by your browser. Please try using a different browser or device.</p>';
             }
         }
 
-        function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
-            const R = 6371;
+        function getDistanceFromLatLonInMiles(lat1, lon1, lat2, lon2) {
+            const R = 3959; // Radius of the earth in miles
             const dLat = deg2rad(lat2-lat1);
             const dLon = deg2rad(lon2-lon1); 
             const a = 
@@ -302,7 +281,7 @@
                 <span style="color: #666;">Address:</span> ${location.address}<br>
                 <span style="color: #666;">Hours:</span> ${location.schedule}<br>
                 <a href="https://sfpopos.com/popos/${location.id}" target="_blank">More Info</a><br>
-                <a href="https://www.google.com/maps/search/?api=1&query=${location.lat},${location.lon}" target="_blank" class="maps-link">Open in Google Maps</a>
+                <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(location.address)}" target="_blank" class="maps-link">Open in Google Maps</a>
                 <div class="rating-container" id="rating-${location.id}">
                     <button onclick="ratePopos(${location.id}, 'up')" class="rating-btn thumbs-up">👍</button>
                     <button onclick="ratePopos(${location.id}, 'down')" class="rating-btn thumbs-down">👎</button>
@@ -310,11 +289,7 @@
             `;
         }
 
-        // Initialize the map when the page loads
-        window.onload = function() {
-            console.log("Window loaded, initializing map...");
-            initMap();
-        };
+        window.onload = initMap;
     </script>
 </body>
 </html>
