@@ -29,7 +29,7 @@
         header {
             text-align: center;
             padding: 1rem;
-            margin-bottom: 2rem;
+            margin-bottom: 1rem;
         }
         h1 { 
             font-weight: 700;
@@ -70,16 +70,17 @@
             border: none;
             border-radius: 5px;
             transition: background-color 0.3s ease;
+            margin-top: 20px;
         }
         button:hover {
             background-color: #2a2a2a;
         }
         a {
             color: var(--header-color);
-            text-decoration: none;
+            text-decoration: underline;
         }
         a:hover {
-            text-decoration: underline;
+            text-decoration: none;
         }
         .maps-link {
             display: inline-block;
@@ -120,8 +121,8 @@
     </header>
     <div class="container">
         <p>POPOS are publicly accessible spaces in forms of plazas, terraces, atriums, small parks, and even snippets which are provided and maintained by private developers. In San Francisco, POPOS mostly appear in the Downtown office district area.</p>
-        <button onclick="findNearestPOPOS()">Find Nearest POPOS</button>
         <div id="map"></div>
+        <button onclick="findNearestPOPOS()">Find Nearest POPOS</button>
         <div id="result"></div>
     </div>
 
@@ -172,7 +173,7 @@
 
                     document.getElementById('result').innerHTML = `
                         <p>The nearest POPOS is <strong><a href="https://sfpopos.com/popos/${closest.id}" target="_blank">${closest.name}</a></strong>.</p>
-                        <p>Address: ${closest.address}</p>
+                        <p><a href="https://sfpopos.com/popos/${closest.id}" target="_blank">${closest.address}</a></p>
                         ${closest.distance < 0.5 ? `<p>Approximately ${Math.round(closest.distance * 5280 / 272)} min walk</p>` : ''}
                         <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(closest.address)}" target="_blank" class="maps-link">Open in Google Maps</a>
                     `;
@@ -215,8 +216,7 @@
         function createPoposPopup(location) {
             return `
                 <strong>${location.name}</strong><br>
-                Address: ${location.address}<br>
-                <a href="https://sfpopos.com/popos/${location.id}" target="_blank">More Info</a><br>
+                <a href="https://sfpopos.com/popos/${location.id}" target="_blank">${location.address}</a><br>
                 <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(location.address)}" target="_blank" class="maps-link">Open in Google Maps</a>
             `;
         }
